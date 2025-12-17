@@ -6,6 +6,9 @@ A smart IoT solution that monitors plant conditions in real-time and automates i
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Version](https://img.shields.io/badge/version-1.0.0-green.svg)
+[![Built with ESP32](https://img.shields.io/badge/Built%20with-ESP32-blue?logo=espressif)](https://www.espressif.com/)
+[![FastAPI](https://img.shields.io/badge/API-FastAPI-green?logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Deployed on Pythonanywhere](https://img.shields.io/badge/API-PythonAnywhere-green?logo=pythonanywhere)](https://www.pythonanywhere.com/)
 
 ## 🌱 Features
 
@@ -52,9 +55,9 @@ Analog Input:
 - GPIO0: Soil Moisture Sensor (ADC) 1
 - GPIO1: Soil Moisture Sensor (ADC) 2
 
-Motor Control (DRV8833):
-- GPIO20: AIN1 (Forward)
-- GPIO19: AIN2 (Reverse)
+Water Pump Control (DRV8833):
+- GPIO20: AIN1 
+- GPIO19: AIN2
 - GPIO18: PWM Control
 
 Power:
