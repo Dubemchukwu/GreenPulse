@@ -26,7 +26,7 @@ A smart IoT solution that monitors plant conditions in real-time and automates i
 |-----------|--------------|----------|
 | Microcontroller | ESP32-C6 | 1 |
 | Soil Moisture Sensor | Capacitive Sensor | 2 |
-| Environmental Sensor | BME280 (I2C) | 1 |
+| Environmental Sensor | BME280 (I2C) | 2 |
 | Display | 0.96" SSD1306 OLED (I2C) | 1 |
 | Water Pump | 5V DC Amphibious Motor | 1 |
 | Pump Driver | DRV8833 Motor Driver | 1 |
@@ -46,18 +46,21 @@ A smart IoT solution that monitors plant conditions in real-time and automates i
 #### ESP32-C6 Connections
 ```
 I2C Bus (Shared):
-- SDA: GPIO6
-- SCL: GPIO7
-  - BME280 Sensor
+- SDA0: GPIO6
+- SCL0: GPIO7
+  - BME280 Sensor 1
   - SSD1306 OLED Display
+- SDA1: GPIO8
+- SCL1: GPIO9
+  - BME280 Sensor 2
 
 Analog Input:
 - GPIO0: Soil Moisture Sensor (ADC) 1
 - GPIO1: Soil Moisture Sensor (ADC) 2
 
 Water Pump Control (DRV8833):
-- GPIO20: AIN1 
-- GPIO19: AIN2
+- GPIO19: AIN1 
+- GPIO20: AIN2
 - GPIO18: PWM Control
 
 Power:
@@ -248,7 +251,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Authors
 
-- Onyilimba Dubemchukwu - Firmware & Hardware
+- Onyilimba Dubemchukwu - Firmware & Hardware Engineering
 
 ## 🙏 Acknowledgments
 
