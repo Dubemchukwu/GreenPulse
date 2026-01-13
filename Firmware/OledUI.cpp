@@ -10,8 +10,12 @@
 #define HEIGHT 64
 #define CHAR_WIDTH 6
 #define CHAR_HEIGHT 20
+#define WIFI_DISPLAY_DELAY 2000
 
+CurrentScreen currentScreen = HOME;
+CurrentScreen previousScreen = WIFI;
 bool OledDisplayInitState;
+long lastWifiDisplayTime = 0;
 
 Adafruit_SSD1306 display(WIDTH, HEIGHT, &Wire, RESET);
 
@@ -65,31 +69,111 @@ void showReadings(int soilMoistureValue, float tempValue, float humidityValue){
     if(!OledDisplayInitState){
         return;
     }
+    
+    // Ensure that the screen is in proper format
+    if(previousScreen != currentScreen){
+        clearDisplayContent();
+        
+        // First Line of Text
+        display.setCursor(10,8);
+        display.print("SOIL: ");
+        display.setCursor((6*CHAR_WIDTH)+10,8);
+        display.printf("%d", soilMoistureValue);
+        display.setCursor((6*CHAR_WIDTH)+25,8);
+        display.print("%");
+        
+        // Second Line of Text 
+        display.setCursor(10, CHAR_HEIGHT+8);
+        display.print("TEMP: ");
+        display.setCursor((6*CHAR_WIDTH)+10, CHAR_HEIGHT+8);
+        display.printf("%.2f", tempValue);
+        display.setCursor((10*CHAR_WIDTH)+19, CHAR_HEIGHT+8);
+        display.print("C");
+        
+        // Third Line of Text
+        display.setCursor(10, (2*CHAR_HEIGHT)+8);
+        display.print("HUMD: ");
+        display.setCursor((6*CHAR_WIDTH)+10, (2*CHAR_HEIGHT)+8);
+        display.printf("%.2f ", humidityValue);
+        display.setCursor((10*CHAR_WIDTH)+19, (2*CHAR_HEIGHT)+8);
+        display.print("%");
+        
+        // Wifi Status blob
+        if(wifiIsConnected){
+            display.fillCircle(WIDTH-16, (2*CHAR_HEIGHT)+10, 5, SSD1306_WHITE);
+        }else{
+            display.fillCircle(WIDTH-16, (2*CHAR_HEIGHT)+10, 5, SSD1306_BLACK);
+        }
+        
+        previousScreen = currentScreen;
+        
+    }else{
+        // First Line of Text
+        // clear text space
+        display.fillRect((6*CHAR_WIDTH)+10, 8, (6*CHAR_WIDTH)+24, CHAR_HEIGHT/2, SSD1306_BLACK);
+        // display content
+        display.setCursor((6*CHAR_WIDTH)+10,8);
+        display.printf("%d", soilMoistureValue);
+        display.setCursor((6*CHAR_WIDTH)+25,8);
+        display.print("%");
+        
+        // Second Line of Text
+        // clear text space
+        display.fillRect((6*CHAR_WIDTH)+10, CHAR_HEIGHT+8, (6*CHAR_WIDTH)+22, CHAR_HEIGHT/2, SSD1306_BLACK);
+        // display content
+        display.setCursor((6*CHAR_WIDTH)+10, CHAR_HEIGHT+8);
+        display.printf("%.2f", tempValue);
+        display.setCursor((10*CHAR_WIDTH)+19, CHAR_HEIGHT+8);
+        display.print("C");
+        
+        // Third Line of Text
+        // clear text space
+        display.fillRect((6*CHAR_WIDTH)+10, (2*CHAR_HEIGHT)+8, (6*CHAR_WIDTH)+22, CHAR_HEIGHT/2, SSD1306_BLACK);
+        // display content
+        display.setCursor((6*CHAR_WIDTH)+10, (2*CHAR_HEIGHT)+8);
+        display.printf("%.2f", humidityValue);
+        display.setCursor((10*CHAR_WIDTH)+19, (2*CHAR_HEIGHT)+8);
+        display.print("%");
+        
+        // Wifi Status blob
+        if(wifiIsConnected){
+            display.fillCircle(WIDTH-16, (2*CHAR_HEIGHT)+10, 5, SSD1306_WHITE);
+        }else{
+            display.fillCircle(WIDTH-16, (2*CHAR_HEIGHT)+10, 5, SSD1306_BLACK);
+        }
+    }
+    
+    display.display();
+}
+
+void displayWifiState(){
+    if(!OledDisplayInitState){
+        return;
+    }
+    
+    if(millis() - lastWifiDisplayTime >= WIFI_DISPLAY_DELAY){
     // Ensure that the screen is in proper format
     clearDisplayContent();
     
-    // First Line of Text
-    display.setCursor(10,8);
-    display.print("SOIL: ");
-    display.setCursor((6*CHAR_WIDTH)+10,8);
-    display.printf("%d", soilMoistureValue);
-    display.setCursor((6*CHAR_WIDTH)+22,8);
-    display.print("%");
+    // Wifi Status Display Text
+    if(wifiIsConnected){
+        display.setCursor(WIDTH-(((12*CHAR_WIDTH)+5)/2), 8);
+        display.print("connected to");
+        display.setTextSize(2);
+        display.setCursor((WIDTH-((4*CHAR_WIDTH)+5))/2, CHAR_HEIGHT+10);
+        display.print("WIFI");
+        display.setTextSize(1);
+    }else{
+        display.setCursor((WIDTH-(12*CHAR_WIDTH)+5)/2, 8);
+        display.print("wifi Disconnected");
+        display.setTextSize(2);
+        display.setCursor((WIDTH-((2*CHAR_WIDTH)+5))/2, CHAR_HEIGHT+10);
+        display.print("❌x");
+        display.setTextSize(1);
+    }
     
-    // Second Line of Text 
-    display.setCursor(10, CHAR_HEIGHT+8);
-    display.print("TEMP: ");
-    display.setCursor((6*CHAR_WIDTH)+10, CHAR_HEIGHT+8);
-    display.printf("%.2f C", tempValue);
-    
-    // Third Line of Text
-    display.setCursor(10, (2*CHAR_HEIGHT)+8);
-    display.print("HUMD: ");
-    display.setCursor((6*CHAR_WIDTH)+10, (2*CHAR_HEIGHT)+8);
-    display.printf("%.2f ", humidityValue);
-    display.setCursor((10*CHAR_WIDTH)+22, (2*CHAR_HEIGHT)+8);
-    display.print("%");
-    
+    // Update the display
     display.display();
+    }
     
 }

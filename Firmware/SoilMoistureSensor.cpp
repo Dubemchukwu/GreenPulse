@@ -15,16 +15,16 @@ int soil_moisture_sens_two = 1;
 int readSoilMoisture(int specificSensor){
     if(specificSensor == 0){
         int soil_moisture_value = (int)((analogRead(soil_moisture_sens_one) + analogRead(soil_moisture_sens_two))/2);
-        return SoilMoistureTranslator(soil_moisture_value);
+        return soil_moisture_value;
     }else if(specificSensor == 1){
         int soil_moisture_value = analogRead(soil_moisture_sens_one);
-        return SoilMoistureTranslator(soil_moisture_value);      
+        return soil_moisture_value;      
     }else if(specificSensor == 2){
         int soil_moisture_value = analogRead(soil_moisture_sens_two);
-        return SoilMoistureTranslator(soil_moisture_value);    
+        return soil_moisture_value;    
     }else{
         int soil_moisture_value = (analogRead(soil_moisture_sens_one) + analogRead(soil_moisture_sens_two))/2;
-        return SoilMoistureTranslator(soil_moisture_value);
+        return soil_moisture_value;
     }
 }
 

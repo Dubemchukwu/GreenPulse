@@ -23,8 +23,8 @@ bool initializeSensorOne();
 bool initializeSensorTwo();
 bool initializeSensorHelper(TwoWire *Mywire, Adafruit_BME280 _bme_);
 void initializeSensor();
-float readTemperature(int specificSensor = 0);
-float readHumidity(int specificSensor = 0);
-float readPressure(int specificSensor = 0);
+float readTemperature(int specificSensor = 1);
+float readHumidity(int specificSensor = 1);
+float readPressure(int specificSensor = 1);
 
 #endif
