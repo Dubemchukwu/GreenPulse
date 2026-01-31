@@ -21,6 +21,7 @@ long lastSensorUpdate = 0;
 
 Adafruit_SSD1306 display(WIDTH, HEIGHT, &Wire, RESET);
 
+// Initialize Oled Display
 void initializeOledDisplay(){
     Serial.printf("[Display] Initializing SSD1306 0.96' OLED Display ");
     OledDisplayInitState = display.begin(0x02, 0x3C);
@@ -101,6 +102,7 @@ void showReadings(int soilMoistureValue, float tempValue, float humidityValue){
         display.print("%");
         
         // Api Status blob
+        // For Status Debugging
         if(updateApiState){
             display.fillCircle(WIDTH-16, (CHAR_HEIGHT), 5, SSD1306_WHITE);
         }else{
@@ -150,7 +152,8 @@ void showReadings(int soilMoistureValue, float tempValue, float humidityValue){
             lastSensorUpdate = millis();
         }
         
-        // Api Status blob
+        // Api Status blob 
+        // For Status Debugging
         if(updateApiState){
             display.fillCircle(WIDTH-16, (CHAR_HEIGHT), 5, SSD1306_WHITE);
         }else{
