@@ -4,7 +4,7 @@
 #include "Networks.h"
 
 #define MAX_RETRIES 7
-#define MAX_RETRIES_DELAY 500
+#define MAX_RETRIES_DELAY 1000
 
 int retryCount = 0;
 bool retryMessageState = false;
@@ -80,7 +80,11 @@ void connectWifi() {
             Serial.println("\n[WiFi] Maximum retries reached");
             retryCount = 0;
             vTaskDelay(500 / portTICK_PERIOD_MS);
-            initializeWifi();
+            
+            if (!wifiIsConnected) {
+                ESP.restart();
+            }
+            // initializeWifi();
         }
         
         if (!retryMessageState) {
@@ -99,20 +103,14 @@ void connectWifi() {
 void initializeWifi() {
     Serial.println("[WiFi] Initializing...");
     
-    // Register event handler BEFORE WiFi.begin()
-    // WiFi.onEvent(WiFiEvent);
-    
     // Disconnect and clear
-    WiFi.disconnect(true);
-    vTaskDelay(500 / portTICK_PERIOD_MS);
-    
-    // Clear WiFi mode
-    WiFi.mode(WIFI_OFF);
-    vTaskDelay(500 / portTICK_PERIOD_MS);
+    WiFi.disconnect(true, true);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     
     // Configure WiFi
     WiFi.mode(WIFI_STA);
     WiFi.setHostname("GreenPulse");
+    WiFi.setAutoReconnect(false);
     
     // Start connection
     Serial.printf("[WiFi] Connecting to %s", SSID1);
@@ -121,7 +119,7 @@ void initializeWifi() {
     // Wait for connection
     int timeout = MAX_RETRIES;
     while (WiFi.status() != WL_CONNECTED && timeout > 0) {
-        vTaskDelay(700 / portTICK_PERIOD_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
         Serial.print(".");
         timeout--;
     }

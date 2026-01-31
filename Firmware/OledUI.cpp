@@ -10,12 +10,14 @@
 #define HEIGHT 64
 #define CHAR_WIDTH 6
 #define CHAR_HEIGHT 20
-#define WIFI_DISPLAY_DELAY 2000
+#define WIFI_DISPLAY_DELAY 4000
+#define SENSOR_DATA_DELAY 1000
 
 CurrentScreen currentScreen = HOME;
 CurrentScreen previousScreen = WIFI;
 bool OledDisplayInitState;
 long lastWifiDisplayTime = 0;
+long lastSensorUpdate = 0;
 
 Adafruit_SSD1306 display(WIDTH, HEIGHT, &Wire, RESET);
 
@@ -98,48 +100,68 @@ void showReadings(int soilMoistureValue, float tempValue, float humidityValue){
         display.setCursor((10*CHAR_WIDTH)+19, (2*CHAR_HEIGHT)+8);
         display.print("%");
         
+        // Api Status blob
+        if(updateApiState){
+            display.fillCircle(WIDTH-16, (CHAR_HEIGHT), 5, SSD1306_WHITE);
+        }else{
+            display.fillCircle(WIDTH-16, (CHAR_HEIGHT), 5, SSD1306_BLACK);
+        }
+        
         // Wifi Status blob
         if(wifiIsConnected){
-            display.fillCircle(WIDTH-16, (2*CHAR_HEIGHT)+10, 5, SSD1306_WHITE);
+            display.fillCircle(WIDTH-16, (2*CHAR_HEIGHT)+5, 5, SSD1306_WHITE);
         }else{
-            display.fillCircle(WIDTH-16, (2*CHAR_HEIGHT)+10, 5, SSD1306_BLACK);
+            display.fillCircle(WIDTH-16, (2*CHAR_HEIGHT)+5, 5, SSD1306_BLACK);
         }
         
         previousScreen = currentScreen;
         
     }else{
-        // First Line of Text
-        // clear text space
-        display.fillRect((6*CHAR_WIDTH)+10, 8, (6*CHAR_WIDTH)+24, CHAR_HEIGHT/2, SSD1306_BLACK);
-        // display content
-        display.setCursor((6*CHAR_WIDTH)+10,8);
-        display.printf("%d", soilMoistureValue);
-        display.setCursor((6*CHAR_WIDTH)+25,8);
-        display.print("%");
         
-        // Second Line of Text
-        // clear text space
-        display.fillRect((6*CHAR_WIDTH)+10, CHAR_HEIGHT+8, (6*CHAR_WIDTH)+22, CHAR_HEIGHT/2, SSD1306_BLACK);
-        // display content
-        display.setCursor((6*CHAR_WIDTH)+10, CHAR_HEIGHT+8);
-        display.printf("%.2f", tempValue);
-        display.setCursor((10*CHAR_WIDTH)+19, CHAR_HEIGHT+8);
-        display.print("C");
+        if(millis() - lastSensorUpdate >= SENSOR_DATA_DELAY ){
+            
+            // First Line of Text
+            // clear text space
+            display.fillRect((6*CHAR_WIDTH)+10, 8, (6*CHAR_WIDTH)+24, CHAR_HEIGHT/2, SSD1306_BLACK);
+            // display content
+            display.setCursor((6*CHAR_WIDTH)+10,8);
+            display.printf("%d", soilMoistureValue);
+            display.setCursor((6*CHAR_WIDTH)+25,8);
+            display.print("%");
+            
+            // Second Line of Text
+            // clear text space
+            display.fillRect((6*CHAR_WIDTH)+10, CHAR_HEIGHT+8, (6*CHAR_WIDTH)+22, CHAR_HEIGHT/2, SSD1306_BLACK);
+            // display content
+            display.setCursor((6*CHAR_WIDTH)+10, CHAR_HEIGHT+8);
+            display.printf("%.2f", tempValue);
+            display.setCursor((10*CHAR_WIDTH)+19, CHAR_HEIGHT+8);
+            display.print("C");
+            
+            // Third Line of Text
+            // clear text space
+            display.fillRect((6*CHAR_WIDTH)+10, (2*CHAR_HEIGHT)+8, (6*CHAR_WIDTH)+22, CHAR_HEIGHT/2, SSD1306_BLACK);
+            // display content
+            display.setCursor((6*CHAR_WIDTH)+10, (2*CHAR_HEIGHT)+8);
+            display.printf("%.2f", humidityValue);
+            display.setCursor((10*CHAR_WIDTH)+19, (2*CHAR_HEIGHT)+8);
+            display.print("%");
+            
+            lastSensorUpdate = millis();
+        }
         
-        // Third Line of Text
-        // clear text space
-        display.fillRect((6*CHAR_WIDTH)+10, (2*CHAR_HEIGHT)+8, (6*CHAR_WIDTH)+22, CHAR_HEIGHT/2, SSD1306_BLACK);
-        // display content
-        display.setCursor((6*CHAR_WIDTH)+10, (2*CHAR_HEIGHT)+8);
-        display.printf("%.2f", humidityValue);
-        display.setCursor((10*CHAR_WIDTH)+19, (2*CHAR_HEIGHT)+8);
-        display.print("%");
+        // Api Status blob
+        if(updateApiState){
+            display.fillCircle(WIDTH-16, (CHAR_HEIGHT), 5, SSD1306_WHITE);
+        }else{
+            display.fillCircle(WIDTH-16, (CHAR_HEIGHT), 5, SSD1306_BLACK);
+        }
         
         // Wifi Status blob
         if(wifiIsConnected){
-            display.fillCircle(WIDTH-16, (2*CHAR_HEIGHT)+10, 5, SSD1306_WHITE);
+            display.fillCircle(WIDTH-16, (2*CHAR_HEIGHT)+5, 5, SSD1306_WHITE);
         }else{
-            display.fillCircle(WIDTH-16, (2*CHAR_HEIGHT)+10, 5, SSD1306_BLACK);
+            display.fillCircle(WIDTH-16, (2*CHAR_HEIGHT)+5, 5, SSD1306_BLACK);
         }
     }
     
@@ -157,18 +179,16 @@ void displayWifiState(){
     
     // Wifi Status Display Text
     if(wifiIsConnected){
-        display.setCursor(WIDTH-(((12*CHAR_WIDTH)+5)/2), 8);
-        display.print("connected to");
-        display.setTextSize(2);
-        display.setCursor((WIDTH-((4*CHAR_WIDTH)+5))/2, CHAR_HEIGHT+10);
-        display.print("WIFI");
+        display.setCursor(WIDTH-(((15*CHAR_WIDTH)+5)/2), 16);
+        display.print("Wi-Fi connected");
+        display.setCursor((WIDTH-((6*CHAR_WIDTH)+5))/2, CHAR_HEIGHT+26);
+        display.print("Online");
         display.setTextSize(1);
     }else{
-        display.setCursor((WIDTH-(12*CHAR_WIDTH)+5)/2, 8);
-        display.print("wifi Disconnected");
-        display.setTextSize(2);
-        display.setCursor((WIDTH-((2*CHAR_WIDTH)+5))/2, CHAR_HEIGHT+10);
-        display.print("❌x");
+        display.setCursor((WIDTH-(10*CHAR_WIDTH)+5)/2, 16);
+        display.println("Looks like");
+        display.setCursor((WIDTH-(14*CHAR_WIDTH)+5)/2, CHAR_HEIGHT+26);
+        display.println("you’re offline");
         display.setTextSize(1);
     }
     
