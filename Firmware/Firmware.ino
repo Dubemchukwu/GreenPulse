@@ -110,7 +110,28 @@ void wifiManager(void *pvParameters){
 void logicManager(void *pvParameters) {
   for(;;){
     // Logic Manager
-    
+    bool fetchPumpState = fetchPump();
+    if(fetchPumpState){
+        if(SoilMoistureTranslator(readSoilMoisture()) < SOIL_MOISTURE_THRESHOLD){
+            // Implement Exponential Control logic curve
+            // Note: Future Dubem 💀😏 to Implement it
+            // Already did it, thanks past Dubem
+        
+            digitalWrite(LED_BUILTIN, ((String)pumpState["pump"] == "on") ? HIGH : LOW);
+            // int proportionalControlValue = map(SoilMoistureTranslator(readSoilMoisture()), SOIL_DRY_VALUE, SOIL_MOISTURE_THRESHOLD, 0, 100);
+        
+            // Implemented Exponential Control logic curve for Watering / Irrigation
+            // Created for pump button control to avoid overwatering and prevent pump from running dry
+            if((String)pumpState["pump"] == "on"){
+                float normalizeControlValue = (float)(SOIL_MOISTURE_THRESHOLD - SoilMoistureTranslator(readSoilMoisture()))/(float)(SOIL_MOISTURE_THRESHOLD - SOIL_DRY_VALUE);
+                int exponentialControlValue = constrain(100*(pow(normalizeControlValue, GAMMA)), 0, 100);
+                // proportionalControlValue = constrain(proportionalControlValue, 0, 100);
+                // Serial.printf("[LOGIC] Porportional Control Value: %d\n", proportionalControlValue);
+                Serial.printf("[LOGIC] Exponential Control Value: %d\n", exponentialControlValue);
+                moveActuatorPrecise(exponentialControlValue, 1);
+            }
+        }
+    }
     vTaskDelay(pdMS_TO_TICKS(100));
   }
 }

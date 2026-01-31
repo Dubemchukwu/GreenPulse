@@ -11,10 +11,8 @@ uint8_t motorStandby = 0x12;
 
 void initializeActuator() {
     // Initialize Actuator(Pump) and Set it to Stop, to avoid misharps
-    // pinMode(motorInputOne, OUTPUT);
-    // pinMode(motorInputTwo, OUTPUT);
-    
     pinMode(motorStandby, OUTPUT);
+    
     // Initialize LEDC channels
     ledcAttachChannel(motorInputOne, LEDC_FREQ, LEDC_RES, 0);
     ledcAttachChannel(motorInputTwo, LEDC_FREQ, LEDC_RES, 0);
@@ -22,6 +20,7 @@ void initializeActuator() {
 }
 
 void moveActuatorPrecise(int speed, int direction){
+    // converting speed to duty cycle
     int dutyCycle = map(speed, 0, 100, 0, (MAX_SPEED+1));
     
     // Pump Water in forward direction that's into the soil
