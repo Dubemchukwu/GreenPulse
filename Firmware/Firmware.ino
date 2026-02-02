@@ -11,6 +11,7 @@
 #define GAMMA 2.7182818285
 
 long lastApiFetchTime = 0;
+int wifiScreenTimeCounter = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -150,12 +151,21 @@ void displayManager(void *pvParameters) {
   for(;;){
     switch (currentScreen) {
       case WIFI:
-        displayWifiState();
-        digitalWrite(15, wifiIsConnected ? HIGH : LOW);
-        previousScreen = currentScreen;
-        currentScreen = HOME;
+        if(millis() - lastWifiDisplayTime <= WIFI_DISPLAY_TIME){
+            // Serial.println("[DISPLAY-MANAGER] Displaying Wifi State");
+            wifiScreenTimeCounter++;
+            Serial.printf("[DISPLAY-MANAGER] Wifi Screen Time Counter: %d\r\n", (millis() - lastWifiDisplayTime));
+            displayWifiState();
+            rgbLedWrite(8, wifiIsConnected ? 0 : 255, wifiIsConnected ? 255 : 0, 0);
+            // digitalWrite(15, wifiIsConnected ? HIGH : LOW);
+        }else{
+            previousScreen = currentScreen;
+            currentScreen = HOME;
+        }
         break;
       case HOME:
+        wifiScreenTimeCounter = 0;
+        rgbLedWrite(8, 0, 0, 0);
         showReadings(SoilMoistureTranslator(readSoilMoisture(0)), readTemperature(1), readHumidity(1));
         break;
     }
@@ -163,7 +173,7 @@ void displayManager(void *pvParameters) {
     // Serial.println("[DISPLAY-MANAGER] Hi, 😒");
     // Serial.println(SoilMoistureTranslator(readSoilMoisture(0)));
     // Serial.println(readTemperature(1));
-    vTaskDelay(pdMS_TO_TICKS(250));
+    vTaskDelay(pdMS_TO_TICKS(200));
   }
 }
 
@@ -172,12 +182,12 @@ void loop() {
  // rgbLedWrite(8, 255, 255, 255);
  if(millis() - lastApiFetchTime >= API_UPDATE_TIME){
      updateApiState = updateApi();
-     Serial.printf("[API] Success State %s\r\n", updateApiState ? "TRUE" : "FALSE");
-     if(updateApiState){
-         rgbLedWrite(8, 0, 255, 0);
-     }else{
-         rgbLedWrite(8, 255, 0, 0);
-     };
+     // Serial.printf("[API] Success State %s\r\n", updateApiState ? "TRUE" : "FALSE");
+     // if(updateApiState){
+     //     rgbLedWrite(8, 0, 255, 0);
+     // }else{
+     //     rgbLedWrite(8, 255, 0, 0);
+     // };
      
      yield();
      lastApiFetchTime = millis();

@@ -4,13 +4,18 @@
 #include "Networks.h"
 
 #define MAX_RETRIES 7
-#define MAX_RETRIES_DELAY 1000
+#define MAX_RETRIES_DELAY 2000
 
 int retryCount = 0;
 bool retryMessageState = false;
 unsigned long lastCheckTime = 0;
 bool wifiIsConnected = false;
 bool previousState = false;
+
+IPAddress localIP(192, 168, 70, 137);
+IPAddress gateway(192, 168, 70, 166);
+IPAddress subnet(255, 255, 255, 0);
+IPAddress dns(8, 8, 8, 8);
 
 // WiFi event handler for ESP32-C6
 // void WiFiEvent(WiFiEvent_t event) {
@@ -66,7 +71,7 @@ void wifiEvent(){
     if(previousState != wifiIsConnected){
         previousScreen = currentScreen;
         currentScreen = WIFI;
-        lastWifiDisplayTime = millis()+1000;
+        lastWifiDisplayTime = millis();
     }
 }
 
@@ -96,7 +101,7 @@ void connectWifi() {
         WiFi.reconnect();
         retryCount++;
         lastCheckTime = millis();
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        // vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }
 
@@ -108,9 +113,12 @@ void initializeWifi() {
     vTaskDelay(1000 / portTICK_PERIOD_MS);
     
     // Configure WiFi
+    WiFi.setTxPower(WIFI_POWER_8_5dBm);
     WiFi.mode(WIFI_STA);
+    WiFi.setSleep(true);
     WiFi.setHostname("GreenPulse");
     WiFi.setAutoReconnect(false);
+    WiFi.config(localIP, gateway, subnet, dns);
     
     // Start connection
     Serial.printf("[WiFi] Connecting to %s", SSID1);

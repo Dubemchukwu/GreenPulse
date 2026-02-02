@@ -10,7 +10,6 @@
 #define HEIGHT 64
 #define CHAR_WIDTH 6
 #define CHAR_HEIGHT 20
-#define WIFI_DISPLAY_DELAY 4000
 #define SENSOR_DATA_DELAY 1000
 
 CurrentScreen currentScreen = HOME;
@@ -176,27 +175,25 @@ void displayWifiState(){
         return;
     }
     
-    if(millis() - lastWifiDisplayTime >= WIFI_DISPLAY_DELAY){
     // Ensure that the screen is in proper format
     clearDisplayContent();
     
     // Wifi Status Display Text
     if(wifiIsConnected){
-        display.setCursor(WIDTH-(((15*CHAR_WIDTH)+5)/2), 16);
+        display.setCursor((WIDTH-((15*CHAR_WIDTH)+5))/2, 16);
         display.print("Wi-Fi connected");
         display.setCursor((WIDTH-((6*CHAR_WIDTH)+5))/2, CHAR_HEIGHT+26);
         display.print("Online");
         display.setTextSize(1);
     }else{
-        display.setCursor((WIDTH-(10*CHAR_WIDTH)+5)/2, 16);
+        display.setCursor((WIDTH-((10*CHAR_WIDTH)+5))/2, 16);
         display.println("Looks like");
-        display.setCursor((WIDTH-(14*CHAR_WIDTH)+5)/2, CHAR_HEIGHT+26);
-        display.println("you’re offline");
+        display.setCursor((WIDTH-((14*CHAR_WIDTH)+5))/2, CHAR_HEIGHT+26);
+        display.println("you are offline");
         display.setTextSize(1);
     }
     
     // Update the display
     display.display();
-    }
     
 }

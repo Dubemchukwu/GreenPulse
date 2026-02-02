@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include "Networks.h"
 
+#define WIFI_DISPLAY_TIME 4000
 enum CurrentScreen {HOME, WIFI};
 
 extern bool OledDisplayInitState;
