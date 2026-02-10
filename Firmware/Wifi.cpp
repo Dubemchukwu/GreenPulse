@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include "Display.h"
 #include "Networks.h"
+#include "Utils.h"
 
 #define MAX_RETRIES 7
 #define MAX_RETRIES_DELAY 2000
@@ -12,8 +13,8 @@ unsigned long lastCheckTime = 0;
 bool wifiIsConnected = false;
 bool previousState = false;
 
-IPAddress localIP(192, 168, 70, 137);
-IPAddress gateway(192, 168, 70, 166);
+IPAddress localIP(192, 168, 182, 117);
+IPAddress gateway(192, 168, 182, 142);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress dns(8, 8, 8, 8);
 
@@ -121,8 +122,8 @@ void initializeWifi() {
     WiFi.config(localIP, gateway, subnet, dns);
     
     // Start connection
-    Serial.printf("[WiFi] Connecting to %s", SSID1);
-    WiFi.begin(SSID1, PASSWORD1);
+    Serial.printf("[WiFi] Connecting to %s", ssid);
+    WiFi.begin(ssid.c_str(), password.c_str());
     
     // Wait for connection
     int timeout = MAX_RETRIES;

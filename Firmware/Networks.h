@@ -7,7 +7,7 @@
 #include "Config.h"
 #include <Arduino_JSON.h>
 #define API_UPDATE_TIME 2000
-#define HTTP_TIMEOUT 3000
+#define HTTP_TIMEOUT 7000
 
 // Declare pumpState variable
 extern JSONVar pumpState;

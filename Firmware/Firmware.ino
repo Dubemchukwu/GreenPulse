@@ -4,6 +4,7 @@
 #include "Utils.h"
 #include "Actuator.h"
 #include <WiFi.h>
+#include "Utils.h"
 
 #define LED_BUILTIN 15
 #define SOIL_MOISTURE_THRESHOLD 75
@@ -16,6 +17,9 @@ int wifiScreenTimeCounter = 0;
 void setup() {
   Serial.begin(115200);
   
+  // Initialize permanent storage
+  initializePermanentStorage();
+  
   // WiFi Setup
   initializeWifi();
   
@@ -24,6 +28,9 @@ void setup() {
   Wire.begin(6, 7);
   // Wire.setClock(50000);
   // Wire1.setClock(50000);
+  
+  // Initialize web server
+  initializeWebServer();
   
   // GPIO setup
   pinMode(LED_BUILTIN, OUTPUT);
@@ -79,8 +86,8 @@ void setup() {
   // );
 
   xTaskCreatePinnedToCore(
-    logsManager,
-    "logsManager",
+    utilsManager,
+    "utilsManager",
     2048,
     NULL,
     1,
@@ -138,11 +145,12 @@ void logicManager(void *pvParameters) {
 }
 
 // Manages and Sends logs to their various destinations
-void logsManager(void *pvParameters){
+void utilsManager(void *pvParameters){
   for(;;){
-    // loggerCallback(serialLogger);
-    yield();
-    vTaskDelay(pdMS_TO_TICKS(1370));
+      server.handleClient();
+      // loggerCallback(serialLogger);
+      yield();
+      vTaskDelay(pdMS_TO_TICKS(10));
   }
 }
 
@@ -160,7 +168,7 @@ void displayManager(void *pvParameters) {
             // digitalWrite(15, wifiIsConnected ? HIGH : LOW);
         }else{
             previousScreen = currentScreen;
-            currentScreen = HOME;
+                currentScreen = HOME;
         }
         break;
       case HOME:
@@ -180,6 +188,8 @@ void displayManager(void *pvParameters) {
 void loop() {
  // Working Something here
  // rgbLedWrite(8, 255, 255, 255);
+
+
  if(millis() - lastApiFetchTime >= API_UPDATE_TIME){
      updateApiState = updateApi();
      // Serial.printf("[API] Success State %s\r\n", updateApiState ? "TRUE" : "FALSE");
@@ -194,4 +204,6 @@ void loop() {
  }else{
      vTaskDelay(pdMS_TO_TICKS(API_UPDATE_TIME+50));
  };
+ 
+ 
 }
