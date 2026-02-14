@@ -82,6 +82,7 @@ bool checkWifiState() {
 
 void connectWifi() {
     if (millis() - lastCheckTime >= MAX_RETRIES_DELAY) {
+        
         if (retryCount >= MAX_RETRIES) {
             Serial.println("\n[WiFi] Maximum retries reached");
             retryCount = 0;
@@ -119,7 +120,7 @@ void initializeWifi() {
     WiFi.setSleep(true);
     WiFi.setHostname("GreenPulse");
     WiFi.setAutoReconnect(false);
-    WiFi.config(localIP, gateway, subnet, dns);
+    // WiFi.config(localIP, gateway, subnet, dns);
     
     // Start connection
     Serial.printf("[WiFi] Connecting to %s", ssid);

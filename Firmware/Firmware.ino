@@ -148,6 +148,11 @@ void logicManager(void *pvParameters) {
 void utilsManager(void *pvParameters){
   for(;;){
       server.handleClient();
+      if(restartESPWEB){
+          if(millis() - lastESPWEBTime > ESP_WEB_RESTART_DELAY){
+              ESP.restart();
+          }
+      }
       // loggerCallback(serialLogger);
       yield();
       vTaskDelay(pdMS_TO_TICKS(10));
