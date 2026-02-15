@@ -5,7 +5,7 @@ uint8_t motorInputOne = 0x13;
 uint8_t motorInputTwo = 0x14;
 uint8_t motorStandby = 0x12;
 
-#define LEDC_FREQ 10000
+#define LEDC_FREQ 8000
 #define LEDC_RES 8
 #define MAX_SPEED 255
 
@@ -13,9 +13,9 @@ void initializeActuator() {
     // Initialize Actuator(Pump) and Set it to Stop, to avoid misharps
     pinMode(motorStandby, OUTPUT);
     
-    // Initialize LEDC channels
-    ledcAttachChannel(motorInputOne, LEDC_FREQ, LEDC_RES, 0);
-    ledcAttachChannel(motorInputTwo, LEDC_FREQ, LEDC_RES, 0);
+    // Initialize LEDC library for motor control
+    ledcAttach(motorInputOne, LEDC_FREQ, LEDC_RES);
+    ledcAttach(motorInputTwo, LEDC_FREQ, LEDC_RES);
     stopActuator();
 }
 

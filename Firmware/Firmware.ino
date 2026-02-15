@@ -8,7 +8,7 @@
 
 #define LED_BUILTIN 15
 #define SOIL_MOISTURE_THRESHOLD 75
-#define SOIL_DRY_VALUE 33
+#define SOIL_DRY_VALUE 25
 #define GAMMA 2.7182818285
 
 long lastApiFetchTime = 0;
@@ -31,6 +31,9 @@ void setup() {
   
   // Initialize web server
   initializeWebServer();
+  
+  // Initialize and Setup Actuator
+  initializeActuator();
   
   // GPIO setup
   pinMode(LED_BUILTIN, OUTPUT);
@@ -137,6 +140,9 @@ void logicManager(void *pvParameters) {
                 // Serial.printf("[LOGIC] Porportional Control Value: %d\n", proportionalControlValue);
                 Serial.printf("[LOGIC] Exponential Control Value: %d\n", exponentialControlValue);
                 moveActuatorPrecise(exponentialControlValue, 1);
+                // moveActuator();
+            }else{
+                stopActuator();
             }
         }
     }
