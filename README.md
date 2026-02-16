@@ -120,11 +120,23 @@ Power:
 ### Hardware Images
 
 <!-- Add your hardware images here -->
-```
-[System Overview Photo]
-[PCB Assembly Photo]
-[Installed System Photo]
-```
+<div align="center">
+
+![Complete Wiring Diagram](https://github.com/Dubemchukwu/GreenPulse/blob/main/Docs/greenpulse_iso_closed.jpeg?raw=true)
+
+![Complete Wiring Diagram](https://github.com/Dubemchukwu/GreenPulse/blob/main/Docs/greenpulse_front_open.jpeg?raw=true)
+
+![Complete Wiring Diagram](https://github.com/Dubemchukwu/GreenPulse/blob/main/Docs/greenpulse_inside_5.jpeg?raw=true)
+
+![Complete Wiring Diagram](https://github.com/Dubemchukwu/GreenPulse/blob/main/Docs/greenpulse_inside_2.jpeg?raw=true)
+
+![Complete Wiring Diagram](https://github.com/Dubemchukwu/GreenPulse/blob/main/Docs/greenpulse_inside_3.jpeg?raw=true)
+
+![Complete Wiring Diagram](https://github.com/Dubemchukwu/GreenPulse/blob/main/Docs/greenpulse_bottom_closed.jpeg?raw=true)
+
+![Complete Wiring Diagram](https://github.com/Dubemchukwu/GreenPulse/blob/main/Docs/greenpulse_oled_display.jpeg?raw=true)
+
+</div>
 
 ---
 
@@ -386,10 +398,11 @@ If you don't want cloud sync, the system works fully offline using only the OLED
 ### Wiring Diagram
 
 <!-- Add wiring diagram image here -->
+##### BreadBoard View
 ![Complete Wiring Diagram](https://github.com/Dubemchukwu/GreenPulse/blob/main/Hardware/schematic/circuit_bb.png?raw=true)
-```
-[PCB Layout Diagram]
-```
+
+##### Schematic Diagram
+![Complete Wiring Diagram](https://github.com/Dubemchukwu/GreenPulse/blob/main/Hardware/schematic/circuit_schem.png?raw=true)
 
 ---
 
@@ -556,17 +569,17 @@ Efficient data transmission to PythonAnywhere backend:
 ### OLED Display Layout
 
 ```
+
 ┌─────────────────────────┐
-│  ●  GreenPulse    WiFi ● │  ← Status blobs (white = active)
-├─────────────────────────┤
-│  SOIL: 45%              │
-│                         │
-│  TEMP: 24.50 C          │
-│                         │
-│  HUMD: 62.00 %          │
-│                         │
-│         [Status Blobs]  │  ← API (top), WiFi (bottom)
+│ SOIL: 45%               │
+│                      ●  │
+│ TEMP: 24.50 C           │
+│                      ●  │    
+│ HUMD: 62.00 %           │
 └─────────────────────────┘
+
+[Status Blobs] ← API (top), WiFi (bottom)
+
 ```
 
 ### Status Blob Indicators
@@ -591,9 +604,9 @@ When WiFi state changes, the display automatically switches to show connection s
 ```
 ┌─────────────────────────┐
 │                         │
-│   Wi-Fi connected       │
+│     Wi-Fi connected     │
 │                         │
-│      Online             │
+│         Online          │
 │                         │
 └─────────────────────────┘
 ```
@@ -602,9 +615,9 @@ When WiFi state changes, the display automatically switches to show connection s
 ```
 ┌─────────────────────────┐
 │                         │
-│    Looks like           │
+│       Looks like        │
 │                         │
-│  you are offline        │
+│     you are offline     │
 │                         │
 └─────────────────────────┘
 ```
@@ -665,29 +678,6 @@ Each sensor requires calibration for your specific soil type:
    
    In `Firmware/Config.h`, update the pump flow rate constants based on your measurements. This ensures accurate watering duration calculations.
 
-### Advanced Tuning (Optional)
-
-#### Soil Type Adjustments
-
-Different soils have different moisture retention characteristics:
-
-| Soil Type | Dry Threshold | Wet Threshold | Optimal |
-|-----------|--------------|---------------|---------|
-| Sandy | 25% | 55% | 40% |
-| Loamy (Default) | 30% | 60% | 45% |
-| Clay | 35% | 70% | 52% |
-| Potting Mix | 28% | 58% | 43% |
-
-#### Plant-Specific Settings
-
-| Plant Type | Dry Threshold | Wet Threshold | Watering Frequency |
-|------------|--------------|---------------|-------------------|
-| Succulents | 15% | 35% | Every 7-10 days |
-| Ferns | 40% | 75% | Every 2-3 days |
-| Vegetables | 30% | 60% | Every 3-5 days |
-| Tropical | 35% | 70% | Every 2-4 days |
-
-Update `Config.h` with your chosen values.
 
 ---
 
@@ -747,20 +737,18 @@ The ESP32 sends JSON data every minute:
 
 ```json
 {
-    "device_id": "greenpulse-001",
-    "timestamp": "2025-02-02T14:30:00Z",
-    "moisture": 45.2,
+    "soil_moisture": 45.2,
     "temperature": 24.5,
     "humidity": 62.3,
     "pressure": 1013.2,
-    "pump_status": true
+    "pump": "on"
 }
 ```
 
 ### Local-Only Operation
 
 If you prefer not to use cloud sync:
-- Comment out `syncToAPI()` calls in `Firmware/Firmware.ino`
+- Comment out `updateAPI()` calls in `Firmware/Firmware.ino`
 - System operates fully offline
 - All data visible on OLED display
 - Serial Monitor shows detailed logs
