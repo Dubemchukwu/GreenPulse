@@ -5,7 +5,7 @@ int soil_moisture_sens_one = 0;
 int soil_moisture_sens_two = 1;
 
  float SoilMoistureTranslator(int soilMoistureValue){
-    return (float)(soilMoistureValue*100)/4095.0;
+    return (float)((4095 - soilMoistureValue)*100)/4095.0;
 }
 /* 
  * There are only two sensor Available here so, for the parameters
@@ -15,6 +15,7 @@ int soil_moisture_sens_two = 1;
 int readSoilMoisture(int specificSensor){
     if(specificSensor == 0){
         int soil_moisture_value = (int)((analogRead(soil_moisture_sens_one) + analogRead(soil_moisture_sens_two))/2);
+        // Serial.printf("[SENSOR] Soil Moisture Sensor 1: %d, Soil Moisture Sensor 2: %d\n", analogRead(soil_moisture_sens_one), analogRead(soil_moisture_sens_two));
         return soil_moisture_value;
     }else if(specificSensor == 1){
         int soil_moisture_value = analogRead(soil_moisture_sens_one);

@@ -40,8 +40,10 @@ void moveActuatorPrecise(int speed, int direction){
 void moveActuator(){
     // Pump Water in forward direction that's into the soil
     digitalWrite(motorStandby, HIGH);
-    ledcWrite(motorInputOne, MAX_SPEED);
-    ledcWrite(motorInputTwo, 0);
+    digitalWrite(motorInputOne, HIGH);
+    digitalWrite(motorInputTwo, LOW);
+    // ledcWrite(motorInputOne, MAX_SPEED);
+    // ledcWrite(motorInputTwo, 0);
 }
 
 void reverseActuator(){

@@ -44,10 +44,8 @@ bool initializeSensorHelper(TwoWire *Mywire, Adafruit_BME280 _bme_){
 
 // Initializing I2C sensors individually, to avoid the hassle of managing pointers and references.
 bool initializeSensorOne(){
-    Serial.printf("[Sensor] Initializing BME280 temperature and Humidity Sensor 1 ");
-    Serial.println(bme0.begin(0x76, &Wire));
+    Serial.println("[Sensor] Initializing BME280 temperature and Humidity Sensor 1 ");
     static unsigned startupState = bme0.begin(0x76, &Wire);
-    Serial.println(startupState);
     
     for(int i=0; i<=5; i++){
         if(!startupState){
@@ -59,7 +57,7 @@ bool initializeSensorOne(){
         }
     }
     
-    Serial.println("");
+    // Serial.println("");
     if(!startupState){
         Serial.printf("[Sensor] Initialization of BME280 has Failed Woofly, think about your life! 😏\n");
         Serial.println("[Sensor] Check your wiring man, Gosh!");
@@ -104,8 +102,10 @@ bool initializeSensorTwo(){
 void initializeSensor(){
     BME0StartupState = initializeSensorOne();
     // BME1StartupState = initializeSensorTwo();
-    Serial.println(bme0.readTemperature());
-    Serial.println(bme0.readHumidity());
+    
+    // Test Subjects
+    // Serial.println(bme0.readTemperature());
+    // Serial.println(bme0.readHumidity());
 }
 
 /* 

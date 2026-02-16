@@ -4,7 +4,7 @@
 #include "Networks.h"
 #include "Utils.h"
 
-#define MAX_RETRIES 7
+#define MAX_RETRIES 10
 #define MAX_RETRIES_DELAY 2000
 
 int retryCount = 0;
