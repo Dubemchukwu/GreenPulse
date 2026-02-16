@@ -7,8 +7,8 @@
 #include "Utils.h"
 
 #define LED_BUILTIN 15
-#define SOIL_MOISTURE_THRESHOLD 75
-#define SOIL_DRY_VALUE 25
+#define SOIL_MOISTURE_THRESHOLD 65
+#define SOIL_DRY_VALUE 45
 #define GAMMA 2.7182818285
 
 long lastApiFetchTime = 0;
@@ -24,10 +24,20 @@ void setup() {
   initializeWifi();
   
   // I2C setup
-  Wire1.begin(9, 8);
+  // Wire1.begin(9, 8);
   Wire.begin(6, 7);
   // Wire.setClock(50000);
   // Wire1.setClock(50000);
+  
+  xTaskCreatePinnedToCore(
+      initManager,
+      "InitManager",
+      2048,
+      NULL,
+      1,
+      NULL,
+      0
+  );
   
   // Initialize web server
   initializeWebServer();
@@ -37,13 +47,6 @@ void setup() {
   
   // GPIO setup
   pinMode(LED_BUILTIN, OUTPUT);
-  
-  // Initialize and Setup OLED display
-  initializeOledDisplay();
-  setupOledDisplay();
-  
-  // Initialize and Setup Sensor
-  initializeSensor();
 
   Serial.println("[Setup] Doing something Here");
   
@@ -78,15 +81,15 @@ void setup() {
     0
   );
   
-  // xTaskCreatePinnedToCore(
-  //   apiManager,
-  //   "APIManager",
-  //   2048,
-  //   NULL,
-  //   3,
-  //   NULL,
-  //   0
-  // );
+  xTaskCreatePinnedToCore(
+    irrigationManager,
+    "IrrigationManager",
+    2048,
+    NULL,
+    1,
+    NULL,
+    0
+  );
 
   xTaskCreatePinnedToCore(
     utilsManager,
@@ -100,12 +103,39 @@ void setup() {
   
 }
 
-// void apiManager(void *pvParameters){
-//     for(;;){
-//         // Do nothing
-//         yield();
-//     }
-// }
+// Initialize I2C stuffs in different task to speed up boot time
+void initManager(void *pvParameters){
+    // Initialize the system
+    
+    // Initialize and Setup OLED display
+    initializeOledDisplay();
+    setupOledDisplay();
+    
+    // Initialize and Setup Sensor
+    initializeSensor();
+    
+    vTaskDelete(NULL);
+}
+
+// Automatic Irrigation Implementation
+void irrigationManager(void *pvParameters){
+    for(;;){
+        
+        // Upper average soil moisture
+        int HIGH_AVERAGE_SOIL_MOISTURE = SOIL_DRY_VALUE + (SOIL_MOISTURE_THRESHOLD - SOIL_DRY_VALUE)/2;
+        // Lower average soil moisture
+        int LOW_AVERAGE_SOIL_MOISTURE = SOIL_DRY_VALUE + (HIGH_AVERAGE_SOIL_MOISTURE - SOIL_DRY_VALUE)/2 - 1;
+        if(LOW_AVERAGE_SOIL_MOISTURE > SoilMoistureTranslator(readSoilMoisture()) && SoilMoistureTranslator(readSoilMoisture()) < HIGH_AVERAGE_SOIL_MOISTURE){
+            float normalizeControlValue = (float)(HIGH_AVERAGE_SOIL_MOISTURE - SoilMoistureTranslator(readSoilMoisture()))/(float)(HIGH_AVERAGE_SOIL_MOISTURE - LOW_AVERAGE_SOIL_MOISTURE);
+            int exponentialControlValue = constrain(100*(pow(normalizeControlValue, GAMMA)), 0, 100);
+            moveActuatorPrecise(exponentialControlValue, 1);
+            
+        }else{
+            stopActuator();
+        }
+        vTaskDelay(pdMS_TO_TICKS(50));
+    }
+}
 
 void wifiManager(void *pvParameters){
     for(;;){
@@ -127,7 +157,7 @@ void logicManager(void *pvParameters) {
             // Implement Exponential Control logic curve
             // Note: Future Dubem 💀😏 to Implement it
             // Already did it, thanks past Dubem
-        
+            
             digitalWrite(LED_BUILTIN, ((String)pumpState["pump"] == "on") ? HIGH : LOW);
             // int proportionalControlValue = map(SoilMoistureTranslator(readSoilMoisture()), SOIL_DRY_VALUE, SOIL_MOISTURE_THRESHOLD, 0, 100);
         
