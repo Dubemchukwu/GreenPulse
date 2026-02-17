@@ -21,9 +21,6 @@ void setup() {
   // Initialize permanent storage
   initializePermanentStorage();
   
-  // WiFi Setup
-  initializeWifi();
-  
   // I2C setup
   // Wire1.begin(9, 8);
   Wire.begin(6, 7);
@@ -39,6 +36,9 @@ void setup() {
       NULL,
       0
   );
+  
+  // WiFi Setup
+  initializeWifi();
   
   // Initialize web server
   initializeWebServer();
@@ -108,12 +108,12 @@ void setup() {
 void initManager(void *pvParameters){
     // Initialize the system
     
+    // Initialize and Setup Sensor
+    initializeSensor();
+    
     // Initialize and Setup OLED display
     initializeOledDisplay();
     setupOledDisplay();
-    
-    // Initialize and Setup Sensor
-    initializeSensor();
     
     vTaskDelete(NULL);
 }
