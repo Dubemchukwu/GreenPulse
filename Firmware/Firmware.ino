@@ -7,12 +7,13 @@
 #include "Utils.h"
 
 #define LED_BUILTIN 15
-#define SOIL_MOISTURE_THRESHOLD 65
+#define SOIL_MOISTURE_THRESHOLD 70
 #define SOIL_DRY_VALUE 45
 #define GAMMA 2.7182818285
 
 long lastApiFetchTime = 0;
 int wifiScreenTimeCounter = 0;
+bool waterPumpState = false;
 
 void setup() {
   Serial.begin(115200);
@@ -125,11 +126,18 @@ void irrigationManager(void *pvParameters){
         int HIGH_AVERAGE_SOIL_MOISTURE = SOIL_DRY_VALUE + (SOIL_MOISTURE_THRESHOLD - SOIL_DRY_VALUE)/2;
         // Lower average soil moisture
         int LOW_AVERAGE_SOIL_MOISTURE = SOIL_DRY_VALUE + (HIGH_AVERAGE_SOIL_MOISTURE - SOIL_DRY_VALUE)/2 - 1;
-        if(LOW_AVERAGE_SOIL_MOISTURE > SoilMoistureTranslator(readSoilMoisture()) && SoilMoistureTranslator(readSoilMoisture()) < HIGH_AVERAGE_SOIL_MOISTURE){
+        
+        if(SoilMoistureTranslator(readSoilMoisture()) <= LOW_AVERAGE_SOIL_MOISTURE){
+            waterPumpState = true;
+        }else if(SoilMoistureTranslator(readSoilMoisture()) >= HIGH_AVERAGE_SOIL_MOISTURE){
+            waterPumpState = false;
+        }
+        
+        if(waterPumpState){
             float normalizeControlValue = (float)(HIGH_AVERAGE_SOIL_MOISTURE - SoilMoistureTranslator(readSoilMoisture()))/(float)(HIGH_AVERAGE_SOIL_MOISTURE - LOW_AVERAGE_SOIL_MOISTURE);
             int exponentialControlValue = constrain(100*(pow(normalizeControlValue, GAMMA)), 0, 100);
             moveActuatorPrecise(exponentialControlValue, 1);
-            
+            // Serial.printf("[IRG] Watering Plants, MOS: %d\r\n", SoilMoistureTranslator(readSoilMoisture()));
         }else{
             stopActuator();
         }
